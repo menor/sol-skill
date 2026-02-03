@@ -120,6 +120,163 @@ sol ssh -p PROJECT_ID -e ENV_NAME
 sol ssh -p PROJECT_ID -e ENV_NAME --app myapp
 ```
 
+## Multi-Step Workflows
+
+These scenarios require multiple commands. Claude should orchestrate them based on user intent.
+
+### Debug a Failed Deployment
+
+When a user says "my deployment failed" or "why isn't my site working":
+
+1. **Find the project** (if not specified):
+   ```bash
+   sol project:list
+   ```
+
+2. **Check recent activities for failures**:
+   ```bash
+   sol activity:list -p PROJECT_ID --state failed --limit 5
+   ```
+
+3. **Get the activity log to identify the error**:
+   ```bash
+   sol activity:log ACTIVITY_ID -p PROJECT_ID
+   ```
+
+4. **Report findings**: Look for build errors, deployment failures, or resource issues in the log output.
+
+### Set Up a Feature Branch Environment
+
+When a user says "create a new environment for feature X" or "I need a staging copy":
+
+1. **List existing environments to find the parent**:
+   ```bash
+   sol environment:list -p PROJECT_ID
+   ```
+
+2. **Create the branch environment**:
+   ```bash
+   sol environment:branch feature-x -p PROJECT_ID --parent main --title "Feature X Development"
+   ```
+
+3. **Copy any environment-specific variables if needed**:
+   ```bash
+   # Get variables from parent
+   sol variable:list -p PROJECT_ID -e main --level environment
+
+   # Set on new environment (for each variable that needs copying)
+   sol variable:set VAR_NAME "value" -p PROJECT_ID -e feature-x --level environment
+   ```
+
+4. **Verify the environment is active**:
+   ```bash
+   sol environment:info feature-x -p PROJECT_ID
+   ```
+
+### Compare Variables Between Environments
+
+When a user says "what's different between staging and production" or "compare env vars":
+
+1. **Get variables from first environment**:
+   ```bash
+   sol variable:list -p PROJECT_ID -e staging --level environment
+   ```
+
+2. **Get variables from second environment**:
+   ```bash
+   sol variable:list -p PROJECT_ID -e main --level environment
+   ```
+
+3. **Compare and report**: Identify variables that exist in one but not the other, or have different values.
+
+### Find and Update a Variable Across Environments
+
+When a user says "update DATABASE_URL everywhere" or "change API_KEY on all environments":
+
+1. **List all environments**:
+   ```bash
+   sol environment:list -p PROJECT_ID
+   ```
+
+2. **Check which environments have the variable**:
+   ```bash
+   # For each environment
+   sol variable:get VAR_NAME -p PROJECT_ID -e ENV_NAME --level environment
+   ```
+
+3. **Update on each environment** (confirm with user first):
+   ```bash
+   sol variable:set VAR_NAME "new-value" -p PROJECT_ID -e ENV_NAME --level environment
+   ```
+
+### Troubleshoot an Inactive Environment
+
+When a user says "my environment isn't working" or "site is down":
+
+1. **Check environment status**:
+   ```bash
+   sol environment:info ENV_NAME -p PROJECT_ID
+   ```
+
+2. **If status is "inactive", activate it**:
+   ```bash
+   sol environment:activate ENV_NAME -p PROJECT_ID
+   ```
+
+3. **If status is "active" but issues persist, check recent activities**:
+   ```bash
+   sol activity:list -p PROJECT_ID -e ENV_NAME --limit 5
+   ```
+
+4. **SSH in to investigate if needed**:
+   ```bash
+   sol ssh -p PROJECT_ID -e ENV_NAME
+   ```
+
+### Clean Up Old Feature Branches
+
+When a user says "clean up old environments" or "delete merged branches":
+
+1. **List all environments**:
+   ```bash
+   sol environment:list -p PROJECT_ID
+   ```
+
+2. **Identify inactive or old environments** (look at status and last activity).
+
+3. **For each environment to remove** (confirm with user first):
+   ```bash
+   # Deactivate first if active
+   sol environment:deactivate ENV_NAME -p PROJECT_ID
+
+   # Then delete
+   sol environment:delete ENV_NAME -p PROJECT_ID
+   ```
+
+### Redeploy After Configuration Change
+
+When a user says "I updated the config, redeploy" or "apply my changes":
+
+1. **Check current environment status**:
+   ```bash
+   sol environment:info ENV_NAME -p PROJECT_ID
+   ```
+
+2. **Trigger redeploy**:
+   ```bash
+   sol redeploy -p PROJECT_ID -e ENV_NAME
+   ```
+
+3. **Monitor the deployment**:
+   ```bash
+   sol activity:list -p PROJECT_ID -e ENV_NAME --state in_progress --limit 1
+   ```
+
+4. **Once complete, verify success**:
+   ```bash
+   sol activity:list -p PROJECT_ID -e ENV_NAME --state complete --limit 1
+   ```
+
 ## Global Flags
 
 These flags work with all commands:
