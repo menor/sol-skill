@@ -8,6 +8,8 @@ allowed-tools: Bash, Read
 
 Sol is an agent-optimized CLI for Upsun. Use it to manage Upsun projects, environments, variables, and deployments.
 
+Output defaults to TOON format (~50% fewer tokens than JSON). Use `-o json` if humans need to read the output.
+
 ## Prerequisites
 
 The `sol` binary must be installed and available in PATH. The user must be authenticated (`sol auth:login`).
@@ -26,20 +28,6 @@ sol variable:set --schema
 ```
 
 The schema includes flags, arguments, output format, examples, and exit codes.
-
-## Output Formats
-
-Sol supports two output formats:
-
-- **JSON** (default): Standard JSON, best for parsing
-- **TOON**: Token-Oriented Object Notation, ~50% fewer tokens
-
-Use `--output toon` when you need to conserve tokens:
-
-```bash
-sol project:list --output toon
-sol environment:list -p PROJECT_ID --output toon
-```
 
 ## Common Workflows
 
@@ -283,9 +271,9 @@ These flags work with all commands:
 
 | Flag | Short | Description |
 |------|-------|-------------|
+| `--output` | `-o` | Output format: toon (default), json |
 | `--project` | `-p` | Project ID (or set UPSUN_PROJECT env var) |
 | `--environment` | `-e` | Environment name (or set UPSUN_ENVIRONMENT env var) |
-| `--output` | `-o` | Output format: json, toon |
 | `--quiet` | `-q` | Suppress non-essential output |
 | `--no-cache` | | Bypass response cache |
 | `--debug` | | Show API request/response details |
@@ -293,16 +281,13 @@ These flags work with all commands:
 
 ## Error Handling
 
-Sol uses structured errors with codes. Check the exit code and parse the JSON error output:
+Sol uses structured errors with codes. Check the exit code and parse the error output:
 
-```json
-{
-  "error": {
-    "code": "NOT_FOUND",
-    "message": "Project not found",
-    "hint": "Check the project ID or run 'sol project:list' to see available projects"
-  }
-}
+```
+[error]
+code: NOT_FOUND
+message: Project not found
+hint: Check the project ID or run 'sol project:list' to see available projects
 ```
 
 Common exit codes:
@@ -315,7 +300,7 @@ Common exit codes:
 ## Best Practices
 
 1. **Use --schema first**: When unsure about a command, check its schema
-2. **Prefer TOON output**: Use `--output toon` to reduce token usage
-3. **Set project context**: Use `-p PROJECT_ID` or set `UPSUN_PROJECT` env var
-4. **Check authentication**: Run `sol auth:info` to verify auth status
+2. **Set project context**: Use `-p PROJECT_ID` or set `UPSUN_PROJECT` env var
+3. **Check authentication**: Run `sol auth:info` to verify auth status
+4. **Use -o json for humans**: When showing output to users who need to read it
 5. **Use --quiet for scripts**: Suppress progress messages with `-q`
