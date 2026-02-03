@@ -1,4 +1,10 @@
-# Sol Skill - Upsun CLI for AI Agents
+---
+name: sol
+description: Use when managing Upsun projects, environments, variables, deployments, or SSH access. Helps with listing projects, creating branches, setting variables, viewing activities, and redeploying.
+allowed-tools: Bash, Read
+---
+
+# Sol - Upsun CLI for AI Agents
 
 Sol is an agent-optimized CLI for Upsun. Use it to manage Upsun projects, environments, variables, and deployments.
 
