@@ -104,8 +104,11 @@ sol activity:list -p PROJECT_ID --limit 10
 # List activities with all fields (result, description, timestamps, etc.)
 sol activity:list -p PROJECT_ID --limit 10 --full
 
-# Filter by state
+# Filter by state (pending, in_progress, complete)
 sol activity:list -p PROJECT_ID --state in_progress
+
+# Filter by result (success, failure)
+sol activity:list -p PROJECT_ID --result failure --limit 10
 
 # View activity log
 sol activity:log ACTIVITY_ID -p PROJECT_ID
@@ -146,7 +149,7 @@ When a user says "my deployment failed" or "why isn't my site working":
 
 2. **Check recent activities for failures**:
    ```bash
-   sol activity:list -p PROJECT_ID --state failed --limit 5
+   sol activity:list -p PROJECT_ID --result failure --limit 5
    ```
 
 3. **Get the activity log to identify the error**:
@@ -307,6 +310,7 @@ These flags work with all commands:
 | Flag | Short | Commands | Description |
 |------|-------|----------|-------------|
 | `--full` | `-f` | `project:list`, `environment:list`, `activity:list` | Include all fields in output |
+| `--result` | | `activity:list` | Filter by result (success, failure) |
 | `--wait` | `-w` | `environment:branch`, `environment:activate`, `environment:deactivate`, `redeploy` | Wait for activity to complete |
 
 ## Error Handling
