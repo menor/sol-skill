@@ -8,7 +8,21 @@ allowed-tools: Bash, Read
 
 Sol is an agent-optimized CLI for Upsun. Use it to manage Upsun projects, environments, variables, and deployments.
 
-Output defaults to TOON format (~50% fewer tokens than JSON). Use `-o json` if humans need to read the output.
+## Output Optimization
+
+Sol minimizes token usage for agents:
+
+- **Lean output by default**: List commands return essential fields only (up to 99% smaller)
+- **TOON format**: Token-efficient encoding (~50% smaller than JSON)
+- **`--full` flag**: Get all fields when needed
+
+| Command | Default fields | Size reduction |
+|---------|---------------|----------------|
+| `project:list` | id, title, region | 82% smaller |
+| `environment:list` | id, name, status, parent | 99% smaller |
+| `activity:list` | id, type, state, created_at | 90% smaller |
+
+Use `-o json` if humans need to read the output. Use `--full` when you need all fields.
 
 ## Prerequisites
 
@@ -34,8 +48,11 @@ The schema includes flags, arguments, output format, examples, and exit codes.
 ### List and Inspect Projects
 
 ```bash
-# List all projects
+# List all projects (returns: id, title, region)
 sol project:list
+
+# List projects with all fields
+sol project:list --full
 
 # Get project details
 sol project:info PROJECT_ID
@@ -44,8 +61,11 @@ sol project:info PROJECT_ID
 ### Manage Environments
 
 ```bash
-# List environments for a project
+# List environments (returns: id, name, status, parent)
 sol environment:list -p PROJECT_ID
+
+# List environments with all fields
+sol environment:list -p PROJECT_ID --full
 
 # Get environment details
 sol environment:info ENV_NAME -p PROJECT_ID
@@ -78,8 +98,11 @@ sol variable:delete VAR_NAME -p PROJECT_ID --level project
 ### View Activities
 
 ```bash
-# List recent activities
+# List recent activities (returns: id, type, state, created_at)
 sol activity:list -p PROJECT_ID --limit 10
+
+# List activities with all fields (result, description, timestamps, etc.)
+sol activity:list -p PROJECT_ID --limit 10 --full
 
 # Filter by state
 sol activity:list -p PROJECT_ID --state in_progress
@@ -278,6 +301,13 @@ These flags work with all commands:
 | `--no-cache` | | Bypass response cache |
 | `--debug` | | Show API request/response details |
 | `--schema` | | Output command schema instead of running |
+
+## Command-Specific Flags
+
+| Flag | Short | Commands | Description |
+|------|-------|----------|-------------|
+| `--full` | `-f` | `project:list`, `environment:list`, `activity:list` | Include all fields in output |
+| `--wait` | `-w` | `environment:branch`, `environment:activate`, `environment:deactivate`, `redeploy` | Wait for activity to complete |
 
 ## Error Handling
 
