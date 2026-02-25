@@ -1,6 +1,6 @@
 ---
 name: sol
-description: Use when managing Upsun projects, environments, variables, deployments, or SSH access. Helps with listing projects, creating branches, setting variables, viewing activities, and redeploying.
+description: Use when managing Upsun projects, environments, variables, deployments, backups, resources, or SSH access. Helps with listing projects, creating branches, setting variables, viewing activities, managing backups, scaling resources, and redeploying.
 allowed-tools: Bash, Read
 ---
 
@@ -291,6 +291,174 @@ When a user says "I updated the config, redeploy" or "apply my changes":
    sol activity:list -p PROJECT_ID -e ENV_NAME --state complete --limit 1
    ```
 
+### Merge a Feature Branch
+
+When a user says "merge my feature branch" or "merge staging into main":
+
+1. **Check environment status**:
+   ```bash
+   sol environment:info feature-x -p PROJECT_ID
+   ```
+
+2. **Merge into parent**:
+   ```bash
+   sol environment:merge feature-x -p PROJECT_ID --wait
+   ```
+
+3. **Verify the merge completed**:
+   ```bash
+   sol activity:list -p PROJECT_ID --limit 1
+   ```
+
+### Sync from Parent Environment
+
+When a user says "sync my branch with main" or "pull latest from production":
+
+1. **Check what will be synced**:
+   ```bash
+   sol environment:info feature-x -p PROJECT_ID
+   ```
+
+2. **Sync code and/or data**:
+   ```bash
+   # Sync both code and data
+   sol environment:sync feature-x -p PROJECT_ID --code --data
+
+   # Or sync code only
+   sol environment:sync feature-x -p PROJECT_ID --code
+   ```
+
+3. **Verify sync completed**:
+   ```bash
+   sol activity:list -p PROJECT_ID -e feature-x --limit 1
+   ```
+
+### Backup and Restore
+
+When a user says "backup my environment" or "I need to restore from backup":
+
+1. **Create a backup**:
+   ```bash
+   # Standard backup
+   sol backup:create -p PROJECT_ID -e main
+
+   # Safe backup (waits for running activities)
+   sol backup:create -p PROJECT_ID -e main --safe
+   ```
+
+2. **List available backups**:
+   ```bash
+   sol backup:list -p PROJECT_ID -e main
+   ```
+
+3. **Restore from backup**:
+   ```bash
+   # Restore to same environment
+   sol backup:restore BACKUP_ID -p PROJECT_ID -e main
+
+   # Restore to a different environment
+   sol backup:restore BACKUP_ID -p PROJECT_ID -e main --target staging
+   ```
+
+### Check Services and Resources
+
+When a user says "what services are running" or "check my app resources":
+
+1. **List services**:
+   ```bash
+   sol service:list -p PROJECT_ID -e main
+   ```
+
+2. **List applications**:
+   ```bash
+   sol app:list -p PROJECT_ID -e main
+   ```
+
+3. **Check resource allocation**:
+   ```bash
+   sol resources:get -p PROJECT_ID -e main
+   ```
+
+4. **Adjust resources if needed**:
+   ```bash
+   sol resources:set -p PROJECT_ID -e main --service db --cpu 1 --memory 2048
+   ```
+
+### Get Environment URLs and Routes
+
+When a user says "what's the URL" or "show me the routes":
+
+1. **Get primary URL**:
+   ```bash
+   sol environment:url -p PROJECT_ID -e main
+   ```
+
+2. **List all routes**:
+   ```bash
+   sol route:list -p PROJECT_ID -e main
+   ```
+
+3. **Check service relationships**:
+   ```bash
+   sol environment:relationships -p PROJECT_ID -e main
+   ```
+
+### Manage Integrations
+
+When a user says "what integrations are set up" or "check GitHub integration":
+
+1. **List all integrations**:
+   ```bash
+   sol integration:list -p PROJECT_ID
+   ```
+
+2. **Get integration details**:
+   ```bash
+   sol integration:get INTEGRATION_ID -p PROJECT_ID
+   ```
+
+### Check Domains and Certificates
+
+When a user says "what domains are configured" or "check SSL certificates":
+
+1. **List domains**:
+   ```bash
+   sol domain:list -p PROJECT_ID
+   ```
+
+2. **List certificates**:
+   ```bash
+   sol certificate:list -p PROJECT_ID
+   ```
+
+### Manage SSH Keys
+
+When a user says "list my SSH keys" or "check SSH access":
+
+1. **List SSH keys**:
+   ```bash
+   sol ssh-key:list
+   ```
+
+### Organization Overview
+
+When a user says "what organizations do I have access to":
+
+1. **List organizations**:
+   ```bash
+   sol organization:list
+   ```
+
+2. **Get organization details**:
+   ```bash
+   sol organization:info ORG_ID
+   ```
+
+3. **List users on a project**:
+   ```bash
+   sol user:list -p PROJECT_ID
+   ```
+
 ## Global Flags
 
 These flags work with all commands:
@@ -309,9 +477,15 @@ These flags work with all commands:
 
 | Flag | Short | Commands | Description |
 |------|-------|----------|-------------|
-| `--full` | `-f` | `project:list`, `environment:list`, `activity:list` | Include all fields in output |
+| `--full` | `-f` | `project:list`, `environment:list`, `activity:list`, etc. | Include all fields in output |
 | `--result` | | `activity:list` | Filter by result (success, failure) |
-| `--wait` | `-w` | `environment:branch`, `environment:activate`, `environment:deactivate`, `redeploy` | Wait for activity to complete |
+| `--wait` | `-w` | `environment:branch`, `environment:merge`, `environment:sync`, `redeploy`, etc. | Wait for activity to complete |
+| `--safe` | | `backup:create` | Wait for running activities before backup |
+| `--target` | | `backup:restore` | Restore to a different environment |
+| `--code` | | `environment:sync` | Sync code from parent |
+| `--data` | | `environment:sync` | Sync data from parent |
+| `--app` | `-a` | `ssh`, `environment:relationships`, `resources:set` | Target specific application |
+| `--service` | `-s` | `resources:set` | Target specific service |
 
 ## Error Handling
 
