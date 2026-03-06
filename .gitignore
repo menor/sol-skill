@@ -9,3 +9,11 @@
 
 # Claude Code
 .claude/
+.claude-docs/
+
+# Skills CLI local installations
+.agents/
+.goose/
+.pi/
+.vibe/
+skills-lock.json
