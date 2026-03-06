@@ -1,12 +1,42 @@
 ---
 name: sol
-description: Use when managing Upsun projects, environments, variables, deployments, backups, resources, or SSH access. Helps with listing projects, creating branches, setting variables, viewing activities, managing backups, scaling resources, and redeploying.
+description: Agent-optimized CLI for Upsun PaaS. Use for deploying, managing environments, debugging failed deployments, setting variables, creating backups, or scaling resources. 98% smaller output than standard CLI.
 allowed-tools: Bash, Read
 ---
 
 # Sol - Upsun CLI for AI Agents
 
 Sol is an agent-optimized CLI for Upsun. Use it to manage Upsun projects, environments, variables, and deployments.
+
+## When to Use This Skill
+
+Activate this skill when users:
+
+- Mention "Upsun" in any infrastructure context
+- Ask about their "project" or "projects" on Upsun
+- Ask about "environments" (staging, production, feature branches)
+- Say "deploy" or "push my changes"
+- Say "my deployment failed" or "why isn't my site working"
+- Request "create a staging environment" or "branch for feature X"
+- Ask "set environment variable" or "update DATABASE_URL"
+- Say "check my backups" or "restore from yesterday"
+- Request "scale my database" or "increase memory"
+- Ask "what's the URL" or "show me the routes"
+- Say "SSH into production" or "check my logs"
+
+## Capabilities
+
+50+ commands across 15 namespaces:
+
+| Namespace | Commands | Examples |
+|-----------|----------|----------|
+| project | 3 | list, info |
+| environment | 10 | branch, merge, sync, activate |
+| variable | 4 | get, set, list, delete |
+| activity | 3 | list, log |
+| backup | 5 | create, restore, list |
+| resources | 2 | get, set |
+| ssh | 1 | shell access |
 
 ## Output Optimization
 
